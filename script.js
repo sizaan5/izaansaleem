@@ -1,4 +1,5 @@
-// Example: Scroll to top on load
-window.onload = () => {
-  window.scrollTo(0, 0);
-};
+window.scrollTo({
+  top: 0,
+  left: 0,
+  behavior: "smooth", // or 'instant'
+});
