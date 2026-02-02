@@ -80,7 +80,11 @@ backToTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
 document.body.appendChild(backToTopBtn);
 
 window.addEventListener("scroll", () => {
-  backToTopBtn.style.display = window.scrollY > 300 ? "block" : "none";
+  if (window.scrollY > 300) {
+    backToTopBtn.classList.add("show");
+  } else {
+    backToTopBtn.classList.remove("show");
+  }
 });
 
 backToTopBtn.addEventListener("click", () => {
@@ -88,100 +92,41 @@ backToTopBtn.addEventListener("click", () => {
 });
 
 /* -----------------------------------
-   SCROLL REVEAL
+   SCROLL REVEAL (STAGGERED)
 ----------------------------------- */
 const revealElements = document.querySelectorAll(
-  "section, .job, .project-list li, .articles-list li"
+  "section, .job, .project-list li, .articles-list li, .skills-list li"
 );
 
 const revealObserver = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
-      if (entry.isIntersecting) entry.target.classList.add("revealed");
+      if (entry.isIntersecting) {
+        entry.target.classList.add("revealed");
+
+        // Stagger children if it's a list
+        const children = entry.target.querySelectorAll("li");
+        children.forEach((child, index) => {
+          setTimeout(() => {
+            child.classList.add("revealed");
+          }, index * 100);
+        });
+      }
     });
   },
-  { threshold: 0.15 }
+  { threshold: 0.1 }
 );
 
 revealElements.forEach((el) => revealObserver.observe(el));
 
 /* -----------------------------------
-   ACTIVE LINK STYLE INJECT
+   ACTIVE LINK STYLE INJECT -> MOVED TO CSS
 ----------------------------------- */
-const style = document.createElement("style");
-style.innerHTML = `
-.nav-links a.active {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-.back-to-top {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-  font-size: 1.2rem;
-  z-index: 999;
-  transition: 0.3s;
-}
-
-.back-to-top:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-}
-
-section, .job, .project-list li, .articles-list li {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: 0.7s ease;
-}
-
-.revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Fade transition */
-html.fade-out {
-  opacity: 0;
-  transition: opacity 0.5s ease-out;
-}
-
-html.fade-in {
-  opacity: 1;
-  transition: opacity 0.5s ease-in;
-}
-`;
-document.head.appendChild(style);
 
 /* -----------------------------------
    APPLE-STYLE PAGE FADE TRANSITION
 ----------------------------------- */
-
 // Fade-in on page load
 document.documentElement.classList.add("fade-in");
 
-// Fade-out before opening external links
-document.querySelectorAll(".project-list a, .articles-list a").forEach((a) => {
-  a.addEventListener("click", (e) => {
-    e.preventDefault();
-    const url = a.href;
-
-    document.documentElement.classList.remove("fade-in");
-    document.documentElement.classList.add("fade-out");
-
-    setTimeout(() => {
-      window.open(url, "_blank");
-      document.documentElement.classList.remove("fade-out");
-      document.documentElement.classList.add("fade-in");
-    }, 350);
-  });
-});
+// Removed unnecessary fade-out logic for external links
